@@ -25,7 +25,7 @@ class Exercice7 extends StatefulWidget {
 }
 
 class _Exercice7State extends State<Exercice7> {
-  int tiles = 3;
+  int tiles = 3, tempTiles = 3;
 
   late List<Tile> tileList = List<Tile>.generate(
       tiles * tiles,
@@ -41,6 +41,7 @@ class _Exercice7State extends State<Exercice7> {
   ImageProvider? image;
 
   void initialize() {
+    tiles = tempTiles;
     tileList = List<Tile>.generate(
         tiles * tiles,
         (index) =>
@@ -129,6 +130,10 @@ class _Exercice7State extends State<Exercice7> {
       tileList[tileList.indexWhere((element) => element.isEmpty)].isEmpty =
           false;
       game = "over";
+      if (image != null) {
+        tempTiles = tiles;
+        tiles = 1;
+      }
       return true;
     }
     return false;
@@ -141,7 +146,11 @@ class _Exercice7State extends State<Exercice7> {
         title: const Text("Jeu de taquin"),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(game == "play" ? Icons.stop : Icons.play_arrow),
+        child: Icon(game == "play"
+            ? Icons.stop
+            : game == "over"
+                ? Icons.replay
+                : Icons.play_arrow),
         onPressed: () {
           setState(() {
             if (game == "stop") {
@@ -169,16 +178,21 @@ class _Exercice7State extends State<Exercice7> {
                     mainAxisSpacing: 5,
                   ),
                   itemBuilder: (ctx, item) {
-                    return tileList[item].display(
-                      onTap: () {
-                        if (game == "play") {
-                          setState(() {
-                            swapTiles(item);
-                            checkCompletion();
-                          });
-                        }
-                      },
-                    );
+                    if (game == "over" && image != null) {
+                      return Image(
+                        image: image!,
+                      );
+                    } else
+                      return tileList[item].display(
+                        onTap: () {
+                          if (game == "play") {
+                            setState(() {
+                              swapTiles(item);
+                              checkCompletion();
+                            });
+                          }
+                        },
+                      );
                   },
                 ),
               ),
